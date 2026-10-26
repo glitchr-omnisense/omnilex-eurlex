@@ -1,6 +1,6 @@
 # omnilex/eurlex
 
-EU law for [omniscient/omnilex](https://github.com/glitchr-studio/omnilex), from the Publications
+EU law for [omnisense/omnilex](https://github.com/glitchr-omnisense/omnilex), from the Publications
 Office's open access to Cellar, the repository behind EUR-Lex: an act **in its consolidated
 version at a date**, one article of it, a judgment of the Court of Justice by its ECLI, the
 links between acts and judgments, what is new. No key.
