@@ -290,6 +290,13 @@ final class EurlexSourceTest extends TestCase
         self::assertStringContainsString('ORDER BY DESC(?date) ?celex LIMIT 21 OFFSET 0', $sparql);
     }
 
+    public function testATitleAndATextAreBothSearched(): void
+    {
+        $this->source()->search(new Query(text: 'pêche', title: 'protection des données', limit: 5));
+
+        self::assertStringContainsString('?title bif:contains "\\"protection\\" AND \\"des\\" AND \\"données\\" AND \\"pêche\\""', $this->calls[0]['query'], 'the text is not dropped: both search the titles');
+    }
+
     public function testACriterionItCannotApplyIsRefused(): void
     {
         $source = $this->source();
@@ -339,9 +346,19 @@ final class EurlexSourceTest extends TestCase
         $source->text('32016R0679');
     }
 
+    public function testContentGivenAsAString(): void
+    {
+        $text = $this->source(['language' => 'en', 'content' => 'false'])->text('http://data.europa.eu/eli/reg/2016/679/oj');
+
+        self::assertNull($text->content, 'content "false": the text is not fetched');
+        self::assertCount(2, $this->calls);
+    }
+
     public function testAnUnknownLanguage(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        self::assertSame([], (new \Omnilex\Registry([new EurlexSourceFactory(new MockHttpClient())], ['eurlex' => ['factory' => 'eurlex', 'options' => ['language' => 'xx']]]))->usable(), 'a misconfigured source is left out');
+
+        $this->expectException(\Omnilex\Exception\InvalidConfigException::class);
         $this->expectExceptionMessage('"xx" is not an official language of the EU');
         $this->source(['language' => 'xx']);
     }

@@ -2,6 +2,7 @@
 
 namespace Omnilex\Eurlex;
 
+use Omnilex\Exception\InvalidConfigException;
 use Omnilex\Exception\NotSupportedException;
 use Omnilex\Exception\ProviderException;
 use Omnilex\Model\Article;
@@ -100,7 +101,7 @@ final class EurlexSource extends HttpSource implements SearchInterface, TextRead
     ) {
         $language = strtolower($language);
         if (!isset(self::LANGUAGES[$language])) {
-            throw new \InvalidArgumentException(\sprintf('"%s" is not an official language of the EU (ISO 639-1).', $language));
+            throw new InvalidConfigException(\sprintf('"%s" is not an official language of the EU (ISO 639-1).', $language));
         }
         $this->language = $language;
         $this->authorityLanguage = self::LANGUAGES[$language];
@@ -300,10 +301,10 @@ final class EurlexSource extends HttpSource implements SearchInterface, TextRead
         $offset = max(0, (int) $query->cursor);
         $where = ['?w cdm:resource_legal_id_celex ?celex ; cdm:work_date_document ?date ; cdm:resource_legal_id_sector ?sector .'];
 
-        $words = trim((string) ($query->title ?? $query->text));
-        if ('' !== $words) {
-            // The endpoint indexes the titles, not the full texts: text and title both search the titles.
-            array_unshift($where, \sprintf('?e cdm:expression_title ?title ; cdm:expression_uses_language %s ; cdm:expression_belongs_to_work ?w . ?title bif:contains %s .', $this->languageUri(), self::literal(self::fulltext($words))));
+        // The endpoint indexes the titles, not the full texts: text and title both search the titles, together when both are set.
+        $words = array_map(self::fulltext(...), array_values(array_filter([trim((string) $query->title), trim((string) $query->text)], static fn (string $w) => '' !== $w)));
+        if ($words) {
+            array_unshift($where, \sprintf('?e cdm:expression_title ?title ; cdm:expression_uses_language %s ; cdm:expression_belongs_to_work ?w . ?title bif:contains %s .', $this->languageUri(), self::literal(implode(' AND ', $words))));
         } else {
             $where[] = \sprintf('OPTIONAL { ?e cdm:expression_belongs_to_work ?w ; cdm:expression_uses_language %s ; cdm:expression_title ?title }', $this->languageUri());
         }

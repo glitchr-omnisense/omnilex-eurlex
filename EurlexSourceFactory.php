@@ -37,7 +37,7 @@ final class EurlexSourceFactory extends SourceFactory
         return new EurlexSource(
             $this->http ?? HttpClient::create(['timeout' => 60]),
             (string) $c->get('language', 'fr'),
-            (bool) $c['content'],
+            $c->bool('content'),
             (string) $c->get('base_uri', EurlexSource::SPARQL_URI),
             (string) $c->get('resource_uri', EurlexSource::RESOURCE_URI),
             ['User-Agent' => self::userAgent($c)],

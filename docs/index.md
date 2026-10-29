@@ -31,20 +31,14 @@ None: both accesses are open. Calls carry the `User-Agent` of the `user_agent` o
 
 | Option | Type | Default | Required | |
 |---|---|---|---|---|
-| `language` | ISO 639-1 | `fr` | no | the language of the titles, labels and texts: one of the 24 official languages of the Union, mapped to the Office's codes (`fr` → `FRA`); another is an `InvalidArgumentException` when the source is built |
-| `content` | bool | `true` | no | whether `text()` and `decision()` also fetch the document (one more call, up to a few megabytes); `article()` always does |
+| `language` | ISO 639-1 | `fr` | no | the language of the titles, labels and texts: one of the 24 official languages of the Union, mapped to the Office's codes (`fr` → `FRA`); another is an `InvalidConfigException` when the source is built, which `Registry::usable()` leaves out |
+| `content` | bool (`"false"`, `"0"` false) | `true` | no | whether `text()` and `decision()` also fetch the document (one more call, up to a few megabytes); `article()` always does |
 | `throttle` | float | `0.5` | no | seconds between two calls |
 | `base_uri` | string | `https://publications.europa.eu/webapi/rdf/sparql` | no | the SPARQL endpoint |
 | `resource_uri` | string | `https://publications.europa.eu/resource/` | no | |
 | `user_agent` | string | `omnilex/1.x (+https://github.com/glitchr-omnisense/omnilex)` | no | |
 
 Without an HTTP client, the factory makes one with a 60-second timeout.
-
-> [!WARNING]
-> Known defect: `content` is read with PHP's `(bool)`: the string `'false'` is true. Give a real
-> boolean. And a `language` that is not an official language is an `InvalidArgumentException`,
-> not an `InvalidConfigException`: `Registry::usable()` throws it instead of leaving the source
-> out.
 
 ## Capabilities
 
@@ -116,7 +110,7 @@ formation as `formation`; `citations` the links from the judgment; `solution`, `
 
 | `Query` | SPARQL |
 |---|---|
-| `text`, `title` | `bif:contains` on the titles in the source's language: every word of two characters or more (`"a" AND "b"`), or the exact expression in double quotes; a text with no such word is an `InvalidArgumentException` |
+| `text`, `title` | `bif:contains` on the titles in the source's language (both set: the words of both, all wanted): every word of two characters or more (`"a" AND "b"`), or the exact expression in double quotes; a text with no such word is an `InvalidArgumentException` |
 | `kind` | `TEXT`: sector 3 (legislation); `DECISION`: sector 6 (judgments, orders, opinions of the Advocates General - `type` says which); none: both; `ARTICLE`: `NotSupportedException` |
 | `types` | `work_has_resource-type`: `REG`, `DIR`, `DEC`, `REG_IMPL`, `JUDG`, `ORDER`, `OPIN_AG`... |
 | `subjects` | `resource_legal_is_about_subject-matter`: the codes of the subject-matter table (`PROT`, `ENV`...) |
@@ -130,11 +124,6 @@ A code of `types`, `subjects` or `jurisdictions` with other characters than lett
 with `_`) are left out. `recent($since)` is the same query from that day, newest first; it reads
 the date of the document, not the day it was added to Cellar: a document published late with an
 old date is not listed as new.
-
-> [!WARNING]
-> Known defect: with both `title` and `text` set, only the title's words are searched and `text`
-> is dropped without a word, where a criterion is expected to be applied or refused (seen on
-> 2026-10-26).
 
 **Links.** `work_cites_work` (`CITES`), `case-law_interpretes_resource_legal` (`INTERPRETS`),
 `resource_legal_based_on_resource_legal` (`BASED_ON`), `resource_legal_amends_resource_legal`
