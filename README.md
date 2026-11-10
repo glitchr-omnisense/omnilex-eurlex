@@ -45,6 +45,17 @@ Journal of the European Union are authentic.**
 
 Verified against the real service on 2026-10-04 (see [docs/](docs/index.md)).
 
+## Usage policy
+
+Declared as data in [`policy.json`](policy.json) (its pages could not be read on 2026-11-10 (https://eur-lex.europa.eu/content/legal-notice/legal-notice.html): see the notes in the file), and honoured on every request by the
+core: a limit reached waits when its window ends within `max_wait` seconds, else the request is not
+sent ([Usage policies](https://github.com/glitchr-omnisense/omnilex/blob/1.x/docs/policies.md)).
+
+- Limits: not published (unknown).
+- Licence: CC-BY-4.0; commercial use: allowed.
+- Credit: required: © European Union, https://eur-lex.europa.eu (https://eur-lex.europa.eu).
+- Needs: nothing.
+
 ## Responsibility
 
 This package is an independent, unofficial client: it is not affiliated with, endorsed by or
