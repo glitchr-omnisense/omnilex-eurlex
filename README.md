@@ -28,6 +28,14 @@ omnilex:
         eurlex: { factory: eurlex, options: { language: fr } }
 ```
 
+## Install
+
+```sh
+composer require omnilex/eurlex
+```
+
+It brings the family's core, `omnisense/omnilex`, and `omnisense/contracts` with it. No account and no key: the Publications Office's endpoint is open (below, and [`policy.json`](policy.json)). `$http` is `HttpClient::create()` in plain PHP.
+
 ## What you need to obtain
 
 Nothing: the endpoint is open, without a key nor an account. The conditions of re-use are those
